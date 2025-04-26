@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD Cliente</title>
+  </head>
+  <body>
+    <h2>CRUD Cliente</h2>
+
+    <form id="clienteForm">
+      <input type="hidden" name="idCliente" />
+      <input type="text" name="nombres" placeholder="Nombres" required />
+      <input type="text" name="apellidos" placeholder="Apellidos" required />
+      <input type="email" name="correo" placeholder="Correo" required />
+      <input type="text" name="direccion" placeholder="Dirección" required />
+      <input
+        type="password"
+        name="password"
+        placeholder="Contraseña"
+        required
+      />
+      <button type="submit">Guardar</button>
+    </form>
+
+    <h3>Lista de Clientes</h3>
+    <table border="1" cellpadding="5" id="clientesTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombres</th>
+          <th>Apellidos</th>
+          <th>Correo</th>
+          <th>Dirección</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script src="./biblioteca.js"></script>
+  </body>
+</html>

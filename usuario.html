@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD Usuarios</title>
+  </head>
+  <body>
+    <h2>Usuarios</h2>
+
+    <form id="form">
+      <input type="hidden" name="idUsuario" />
+      <input type="text" name="nombre" placeholder="Nombres" />
+      <input type="text" name="usuario" placeholder="Usuario" />
+      <input type="password" name="password" placeholder="Contraseña" />
+      <select name="roles" id="roles" multiple>
+      </select>
+      <button type="submit">Guardar</button>
+    </form>
+
+    <h3>Lista de Usuarios</h3>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombres</th>
+          <th>Correo</th>
+          <th>Roles</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <script src="./usuario.js"></script>
+  </body>
+</html>
