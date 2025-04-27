@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Biblioteca</title>
+</head>
+<body>
+<h2>Iniciar Sesión</h2>
+<form id="loginForm">
+    <input type="text" name="usuario" placeholder="Usuario" required>
+    <input type="password" name="contrasena" placeholder="Contraseña" required>
+    <button type="submit">Entrar</button>
+</form>
+
+<p id="mensaje"></p>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    fetch('../controllers/usuarioController.php?action=login', {
+        method: 'POST',
+        body: JSON.stringify({
+            usuario: form.get('usuario'),
+            contrasena: form.get('contrasena')
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = 'biblioteca.html';
+        } else {
+            document.getElementById('mensaje').textContent = data.message || 'Error al iniciar sesión';
+        }
+    });
+});
+</script>
+</body>
+</html>
