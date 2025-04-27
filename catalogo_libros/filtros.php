@@ -38,37 +38,78 @@ $resultado = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Filtrar y Ordenar Catálogo</title>
+    <link rel="stylesheet" href="bootstrap.min.css" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/5.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/5.1/assets/css/docs.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding: 20px;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        input.form-control, select.form-select {
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Filtrar y Ordenar Libros</h1>
 
-    <form method="GET">
-        Categoría: <input type="text" name="categoria" placeholder="Ej: Novela"><br>
-        Autor: <input type="text" name="autor" placeholder="Ej: Gabriel García Márquez"><br>
-        Precio mínimo: <input type="number" name="precio_min" step="0.01"><br>
-        Precio máximo: <input type="number" name="precio_max" step="0.01"><br>
-        Ordenar por:
-        <select name="orden">
-            <option value="">---</option>
-            <option value="precio_asc">Precio: Menor a Mayor</option>
-            <option value="precio_desc">Precio: Mayor a Menor</option>
-        </select><br><br>
-        <button type="submit">Buscar</button>
-    </form>
+<div class="container mt-5">
+    <h1 class="text-center mb-4 text-primary">Filtrar y Ordenar Libros</h1>
 
-    <ul>
+    <div class="form-container">
+        <form method="GET">
+            <div class="mb-3">
+                <label class="form-label">Categoría:</label>
+                <input type="text" name="categoria" class="form-control" placeholder="Ej: Novela">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Autor:</label>
+                <input type="text" name="autor" class="form-control" placeholder="Ej: Gabriel García Márquez">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Precio mínimo:</label>
+                <input type="number" name="precio_min" class="form-control" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Precio máximo:</label>
+                <input type="number" name="precio_max" class="form-control" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Ordenar por:</label>
+                <select name="orden" class="form-select">
+                    <option value="">---</option>
+                    <option value="precio_asc">Precio: Menor a Mayor</option>
+                    <option value="precio_desc">Precio: Mayor a Menor</option>
+                </select>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+                <a href="index.php" class="btn btn-secondary">Volver al Catálogo</a>
+            </div>
+        </form>
+    </div>
+
+    <ul class="list-group">
     <?php while($row = $resultado->fetch_assoc()): ?>
-        <li>
-            <a href="detalle.php?id=<?php echo $row['id']; ?>">
-                <?php echo $row['titulo']; ?> - $<?php echo $row['precio']; ?>
+        <li class="list-group-item">
+            <a href="detalle.php?id=<?php echo $row['id']; ?>" class="text-decoration-none">
+                <?php echo htmlspecialchars($row['titulo']); ?> - $<?php echo number_format($row['precio'], 2); ?>
             </a>
         </li>
     <?php endwhile; ?>
     </ul>
-
-    <a href="index.php">Volver al Catálogo</a>
+</div>
 </body>
-</html>
+</html
