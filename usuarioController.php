@@ -36,10 +36,16 @@ switch ($action) {
         break;
 
     case 'login':
-        $usuario = Usuario::login($conn, $data['usuario'], $data['contrasena']);
+        $data['tipoUsuario'] = strtoupper($data['tipoUsuario']);
+        if ($data['tipoUsuario'] == 'CLIENTE') {
+            $usuario = $data['correo'];
+        } else {
+            $usuario = $data['usuario'];
+        }
+        $usuario = Usuario::login($conn, $usuario, $data['password'], $data['tipoUsuario']);
         if ($usuario) {
-            $_SESSION['usuario'] = $usuario['usuario'];
-            echo json_encode(['success' => true]);
+            $_SESSION['usuario'] = $usuario['nombres'];
+            echo json_encode(['success' => true, "usuario" => $usuario]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Credenciales incorrectas']);
         }
@@ -58,4 +64,3 @@ switch ($action) {
         echo json_encode(['error' => 'Acción no válida']);
         break;
 }
-?>

@@ -37,6 +37,31 @@
       <tbody></tbody>
     </table>
 
+    <script>
+      const loggedIn = sessionStorage.getItem("loggedIn");
+      console.log("🚀 ~ loggedIn:", loggedIn)
+      const loginTime = sessionStorage.getItem("loginTime");
+      console.log("🚀 ~ loginTime:", loginTime)
+
+      const maxSessionTime = 1 * 60 * 1000; // 1 minutos (para probar)
+      // para 6 horas sería: 6 * 60 * 60 * 1000
+      console.log("🚀 ~ maxSessionTime:", maxSessionTime)
+
+      if (!loggedIn || !loginTime) {
+        alert("No tienes permiso. Inicia sesión.");
+        window.location.href = "index.html";
+      } else {
+        const now = Date.now();
+        const elapsedTime = now - parseInt(loginTime);
+        console.log("🚀 ~ elapsedTime:", elapsedTime)
+
+        if (elapsedTime > maxSessionTime) {
+          alert("Sesión expirada. Inicia sesión nuevamente.");
+          sessionStorage.clear();
+          window.location.href = "index.html";
+        }
+      }
+    </script>
     <script src="./biblioteca.js"></script>
   </body>
 </html>

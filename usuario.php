@@ -2,9 +2,11 @@
 ob_clean();
 header('Content-Type: application/json');
 
-class Usuario {
-    public static function getAll($conn) {
-        $result = $conn->query("SELECT u.idUsuario, u.usuario, u.password, u.nombre, u.status, r.idRol, r.nombre AS nombreRol
+class Usuario
+{
+    public static function getAll($conn)
+    {
+        $result = $conn->query("SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.status, r.idRol, r.nombre AS nombreRol
                                 FROM usuario u
                                 LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
                                 LEFT JOIN roles r ON r.idRol = ur.idRol
@@ -18,7 +20,7 @@ class Usuario {
                     'idUsuario' => $row['idUsuario'],
                     'usuario' => $row['usuario'],
                     'password' => $row['password'],
-                    'nombre' => $row['nombre'],
+                    'nombres' => $row['nombre'],
                     'status' => $row['status'],
                     'roles' => []
                 ];
@@ -26,17 +28,18 @@ class Usuario {
             if ($row['idRol'] !== null) {
                 $usuarios[$idUsuario]['roles'][] = [
                     'idRol' => $row['idRol'],
-                    'nombre' => $row['nombreRol']
+                    'nombres' => $row['nombreRol']
                 ];
             }
         }
         return array_values($usuarios); // Devuelve un array indexado numéricamente
     }
 
-    public static function insert($conn, $data) {
+    public static function insert($conn, $data)
+    {
         $conn->begin_transaction(); // Inicia una transacción
 
-        $stmt = $conn->prepare("INSERT INTO usuario (nombre, usuario, password) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO usuario (nombres, usuario, password) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $data['nombre'], $data['usuario'], $data['password']);
 
         if ($stmt->execute()) {
@@ -53,7 +56,8 @@ class Usuario {
             return false;
         }
     }
-    private static function guardarRoles($conn, $idUsuario, $roles) {
+    private static function guardarRoles($conn, $idUsuario, $roles)
+    {
         if (is_array($roles) && !empty($roles)) {
             $stmt = $conn->prepare("INSERT INTO usuario_rol (idUsuario, idRol) VALUES (?, ?)");
             foreach ($roles as $idRol) {
@@ -66,31 +70,38 @@ class Usuario {
         }
         return true;
     }
-    
-    public static function update($conn, $data) {
-        $stmt = $conn->prepare("UPDATE usuario SET nombre=?, usuario=?, password=? WHERE idUsuario=?");
+
+    public static function update($conn, $data)
+    {
+        $stmt = $conn->prepare("UPDATE usuario SET nombres=?, usuario=?, password=? WHERE idUsuario=?");
         $stmt->bind_param("ssi", $data['usuario'], $data['password'], $data['idUsuario']);
         return $stmt->execute();
     }
 
-    public static function delete($conn, $id) {
+    public static function delete($conn, $id)
+    {
         $stmt = $conn->prepare("DELETE FROM usuario WHERE idUsuario=?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
 
-    public static function getById($conn, $id) {
+    public static function getById($conn, $id)
+    {
         $stmt = $conn->prepare("SELECT * FROM usuario WHERE idUsuario=?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
 
-    public static function login($conn, $usuario, $password) {
-        $stmt = $conn->prepare("SELECT * FROM usuario WHERE usuario=? AND password=?");
+    public static function login($conn, $usuario, $password, $tipoUsuario)
+    {
+        if ($tipoUsuario == 'CLIENTE') {
+            $stmt = $conn->prepare("SELECT * FROM cliente WHERE correo=? AND password=?");
+        } else {
+            $stmt = $conn->prepare("SELECT * FROM usuario WHERE usuario=? AND password=?");
+        }
         $stmt->bind_param("ss", $usuario, $password);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
 }
-?>
