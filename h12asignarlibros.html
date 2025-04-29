@@ -13,7 +13,7 @@
 
   <!-- Formulario -->
   <form id="formularioLibro" class="border p-4 shadow rounded bg-light">
-    <input type="hidden" id="indiceEditar" value="">
+    <input type="hidden" id="idLibro">
 
     <div class="mb-3">
       <label for="isbn" class="form-label">ISBN:</label>
@@ -46,7 +46,7 @@
         <option value="Educación">Educación</option>
         <option value="Negocios">Negocios</option>
       </select>
-      <small class="text-muted">Mantén presionada la tecla Ctrl (o Cmd en Mac) para seleccionar varias categorías.</small>
+      <small class="text-muted">Ctrl (o Cmd en Mac) para seleccionar varias categorías.</small>
     </div>
 
     <div class="text-center d-grid gap-2 d-md-block">
@@ -62,7 +62,7 @@
       <table class="table table-bordered table-striped mt-3">
         <thead class="table-dark">
           <tr>
-            <th>#</th>
+            <th>ID</th>
             <th>ISBN</th>
             <th>Título</th>
             <th>Autor</th>
@@ -73,20 +73,22 @@
           </tr>
         </thead>
         <tbody id="tablaLibros">
-          <!-- Aquí se mostrarán los libros -->
+          <!-- Libros aparecerán aquí -->
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
+<!-- SCRIPT -->
 <script>
-let libros = [];
+const formulario = document.getElementById('formularioLibro');
+const tabla = document.getElementById('tablaLibros');
+let editandoId = null;
 
-document.getElementById('formularioLibro').addEventListener('submit', function(e) {
+formulario.addEventListener('submit', function(e) {
   e.preventDefault();
 
-  const indiceEditar = document.getElementById('indiceEditar').value;
   const categoriasSeleccionadas = Array.from(document.getElementById('categorias').selectedOptions).map(option => option.value);
 
   const libro = {
@@ -98,49 +100,50 @@ document.getElementById('formularioLibro').addEventListener('submit', function(e
     categorias: categoriasSeleccionadas
   };
 
-  if (indiceEditar === "") {
-    // Agregar nuevo libro
-    libros.push(libro);
-  } else {
-    // Editar libro existente
-    libros[indiceEditar] = libro;
-    document.getElementById('indiceEditar').value = "";
-  }
+  const action = editandoId ? 'actualizar' : 'insertar';
+  if (editandoId) libro.idLibro = editandoId;
 
-  limpiarFormulario();
-  mostrarLibros();
+  fetch(`libro.php?action=${action}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(libro)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      limpiarFormulario();
+      cargarLibros();
+    } else {
+      alert('Error al guardar: ' + (data.error || ''));
+    }
+  });
 });
 
-function limpiarFormulario() {
-  document.getElementById('formularioLibro').reset();
-  document.getElementById('indiceEditar').value = "";
+function cargarLibros() {
+  fetch('libro.php?action=listar')
+    .then(res => res.json())
+    .then(libros => {
+      tabla.innerHTML = "";
+      libros.forEach(libro => {
+        tabla.innerHTML += `
+          <tr>
+            <td>${libro.idLibro}</td>
+            <td>${libro.isbn}</td>
+            <td>${libro.titulo}</td>
+            <td>${libro.autor}</td>
+            <td>${libro.editorial}</td>
+            <td>${libro.anio}</td>
+            <td>${libro.categorias.join(", ")}</td>
+            <td>
+              <button class="btn btn-warning btn-sm" onclick='editarLibro(${JSON.stringify(libro)})'>Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarLibro(${libro.idLibro})">Eliminar</button>
+            </td>
+          </tr>`;
+      });
+    });
 }
 
-function mostrarLibros() {
-  const tabla = document.getElementById('tablaLibros');
-  tabla.innerHTML = "";
-
-  libros.forEach((libro, index) => {
-    tabla.innerHTML += `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${libro.isbn}</td>
-        <td>${libro.titulo}</td>
-        <td>${libro.autor}</td>
-        <td>${libro.editorial}</td>
-        <td>${libro.anio}</td>
-        <td>${libro.categorias.join(", ")}</td>
-        <td>
-          <button class="btn btn-sm btn-warning" onclick="editarLibro(${index})">Editar</button>
-          <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${index})">Eliminar</button>
-        </td>
-      </tr>
-    `;
-  });
-}
-
-function editarLibro(index) {
-  const libro = libros[index];
+function editarLibro(libro) {
   document.getElementById('isbn').value = libro.isbn;
   document.getElementById('titulo').value = libro.titulo;
   document.getElementById('autor').value = libro.autor;
@@ -152,15 +155,33 @@ function editarLibro(index) {
     option.selected = libro.categorias.includes(option.value);
   });
 
-  document.getElementById('indiceEditar').value = index;
+  editandoId = libro.idLibro;
 }
 
-function eliminarLibro(index) {
-  if (confirm('¿Estás seguro de eliminar este libro?')) {
-    libros.splice(index, 1);
-    mostrarLibros();
+function eliminarLibro(id) {
+  if (confirm('¿Seguro que quieres eliminar este libro?')) {
+    fetch('libro.php?action=eliminar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idLibro: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        cargarLibros();
+      } else {
+        alert('Error al eliminar');
+      }
+    });
   }
 }
+
+function limpiarFormulario() {
+  formulario.reset();
+  editandoId = null;
+}
+
+cargarLibros();
 </script>
 
 </body>
