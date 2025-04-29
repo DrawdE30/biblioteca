@@ -25,7 +25,11 @@ formularioLogin.addEventListener('submit', function (e) {
         .then(data => {
             console.log("🚀 ~ data:", data)
             if (data.success) {
-                window.location.href = 'biblioteca.html';
+                if (tipoUsuario.toUpperCase() == "CLIENTE") {
+                    window.location.href = 'historial.html';
+                } else {
+                    window.location.href = 'h11editarlibros.html';
+                }
                 sessionStorage.setItem('loggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now());
             } else {

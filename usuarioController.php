@@ -37,11 +37,7 @@ switch ($action) {
 
     case 'login':
         $data['tipoUsuario'] = strtoupper($data['tipoUsuario']);
-        if ($data['tipoUsuario'] == 'CLIENTE') {
-            $usuario = $data['correo'];
-        } else {
-            $usuario = $data['usuario'];
-        }
+        $usuario = $data['correo'];
         $usuario = Usuario::login($conn, $usuario, $data['password'], $data['tipoUsuario']);
         if ($usuario) {
             $_SESSION['usuario'] = $usuario['nombres'];
