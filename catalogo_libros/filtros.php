@@ -102,14 +102,17 @@ $resultado = $conn->query($sql);
     </div>
 
     <ul class="list-group">
-    <?php while($row = $resultado->fetch_assoc()): ?>
-        <li class="list-group-item">
-            <a href="detalle.php?id=<?php echo $row['id']; ?>" class="text-decoration-none">
-                <?php echo htmlspecialchars($row['titulo']); ?> - $<?php echo number_format($row['precio'], 2); ?>
-            </a>
-        </li>
-    <?php endwhile; ?>
-    </ul>
-</div>
-</body>
-</html
+<?php while($row = $resultado->fetch_assoc()): ?>
+    <li class="list-group-item d-flex align-items-center">
+        <!-- Imagen de portada -->
+        <?php if (!empty($row['imagen_portada'])): ?>
+            <img src="imagenes/<?php echo htmlspecialchars($row['imagen_portada']); ?>" alt="Portada de <?php echo htmlspecialchars($row['titulo']); ?>" width="80" class="me-3 rounded">
+        <?php endif; ?>
+
+        <!-- Información del libro -->
+        <a href="detalle.php?id=<?php echo $row['id']; ?>" class="text-decoration-none flex-grow-1">
+            <?php echo htmlspecialchars($row['titulo']); ?> - $<?php echo number_format($row['precio'], 2); ?>
+        </a>
+    </li>
+<?php endwhile; ?>
+</ul>
