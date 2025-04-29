@@ -98,7 +98,7 @@ class Usuario
         if ($tipoUsuario == 'CLIENTE') {
             $stmt = $conn->prepare("SELECT * FROM cliente WHERE correo=? AND password=?");
         } else {
-            $stmt = $conn->prepare("SELECT * FROM usuario WHERE usuario=? AND password=?");
+            $stmt = $conn->prepare("SELECT * FROM usuario WHERE correo=? AND password=?");
         }
         $stmt->bind_param("ss", $usuario, $password);
         $stmt->execute();
