@@ -6,7 +6,7 @@ class Usuario
 {
     public static function getAll($conn)
     {
-        $result = $conn->query("SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.status, r.idRol, r.nombre AS nombreRol
+        $result = $conn->query("SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
                                 FROM usuario u
                                 LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
                                 LEFT JOIN roles r ON r.idRol = ur.idRol
@@ -19,8 +19,9 @@ class Usuario
                 $usuarios[$idUsuario] = [
                     'idUsuario' => $row['idUsuario'],
                     'usuario' => $row['usuario'],
+                    'correo' => $row['correo'],
                     'password' => $row['password'],
-                    'nombres' => $row['nombre'],
+                    'nombres' => $row['nombres'],
                     'status' => $row['status'],
                     'roles' => []
                 ];
@@ -39,8 +40,8 @@ class Usuario
     {
         $conn->begin_transaction(); // Inicia una transacción
 
-        $stmt = $conn->prepare("INSERT INTO usuario (nombres, usuario, password) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $data['nombre'], $data['usuario'], $data['password']);
+        $stmt = $conn->prepare("INSERT INTO usuario (nombres, usuario, correo, password) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $data['nombre'],  $data['correo'], $data['usuario'], $data['password']);
 
         if ($stmt->execute()) {
             $idNuevoUsuario = $conn->insert_id;
