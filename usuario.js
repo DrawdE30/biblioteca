@@ -16,35 +16,43 @@ form.addEventListener('submit', e => {
         }
     }
     formData.roles = roles
+    const data = JSON.stringify(formData);
     fetch(`${rootPhp}?action=insertar`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: data
     })
-    .then(res => {
-        if (!res.ok) {
-            console.error("Error en la respuesta del servidor:", res.status, res.statusText);
-            return res.text().then(text => { throw new Error(`Error en la respuesta: ${text}`); });
-        }
-        return res.text(); // Obtén la respuesta como texto
-    })
-    .then(responseText => {
-        console.log("Respuesta del servidor (texto):", responseText);
-        return JSON.parse(responseText); // Intenta parsear el texto como JSON
-    })
-    .then(resp => {
-        console.log("✅ Guardado:", resp);
-        alert("Usuario guardado correctamente");
-        form.reset();
-        listarUsuarios();
-    })
-    .catch(err => {
-        console.error("❌ Error al guardar usuario:", err);
-        alert("Error al guardar usuario");
-    });
+        .then(res => {
+            if (!res.ok) {
+                console.error("Error en la respuesta del servidor:", res.status, res.statusText);
+                return res.text().then(text => { throw new Error(`Error en la respuesta: ${text}`); });
+            }
+            return res.text(); // Obtén la respuesta como texto
+        })
+        .then(responseText => {
+            console.log("Respuesta del servidor (texto):", responseText);
+            return JSON.parse(responseText); // Intenta parsear el texto como JSON
+        })
+        .then(resp => {
+            console.log("✅ Guardado:", resp);
+            alert("Usuario guardado correctamente");
+            form.reset();
+            listarUsuarios();
+            mostrarTabla();
+        })
+        .catch(err => {
+            console.error("❌ Error al guardar usuario:", err);
+            alert("Error al guardar usuario");
+        });
 });
+function mostrarTabla() {
+    document.getElementById("form").reset();
+    $("#roles").selectpicker('val', []);
+    document.getElementById("box-data").classList.add("d-none");
+    document.getElementById("box-list").classList.remove("d-none");
+}
 
 function listarRol() {
     fetch(`${rootPhp}?action=listar_roles`)
@@ -53,6 +61,7 @@ function listarRol() {
             return res.json();
         })
         .then(data => {
+            roles = data;
             const rolesSelect = document.getElementById('roles');
             rolesSelect.innerHTML = '';
             data.forEach(rol => {
@@ -61,6 +70,7 @@ function listarRol() {
                 option.textContent = rol.nombre;
                 rolesSelect.appendChild(option);
             });
+            $('.selectpicker').selectpicker('refresh');
         })
         .catch(error => {
             console.error("🚀 ~ listarRol ~ error:", error);
@@ -77,16 +87,17 @@ function listarUsuarios() {
         .then(data => {
             tableBody.innerHTML = '';
             data.forEach(u => {
-                const nombresRoles = u.roles.map(rol => rol.nombre).join(', ')
+                const nombresRoles = u.roles.map(rol => rol.nombres).join(', ')
                 tableBody.innerHTML += `
                     <tr>
                         <td>${u.idUsuario}</td>
-                        <td>${u.nombre}</td>
+                        <td>${u.nombres}</td>
+                        <td>${u.correo}</td>
                         <td>${u.usuario}</td>
                         <td>${nombresRoles}</td>
                         <td>
-                            <button onclick='editar(${JSON.stringify(u)})'>✏️</button>
-                            <button onclick='eliminar(${u.idUsuario})'>❌</button>
+                            <button class='btn btn-outline-secondary btn-sm' style="font-size:10px;" onclick='editar(${JSON.stringify(u)})'>✏️</button>
+                            <button class='btn btn-outline-danger btn-sm' style="font-size:10px;" onclick='eliminar(${u.idUsuario})'>❌</button>
                         </td>
                     </tr>`;
             });
@@ -98,10 +109,16 @@ function listarUsuarios() {
 }
 
 function editar(u) {
+    document.getElementById("box-data").classList.remove("d-none");
+    document.getElementById("box-list").classList.add("d-none");
     form.idUsuario.value = u.idUsuario;
-    form.nombre.value = u.nombre;
+    form.nombres.value = u.nombres;
     form.usuario.value = u.usuario;
     form.password.value = u.password;
+    form.correo.value = u.correo;
+
+    $("#roles").selectpicker('val', u.roles.map(r => r.idRol));
+
     editando = true;
 }
 
