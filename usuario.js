@@ -96,8 +96,8 @@ function listarUsuarios() {
                         <td>${u.usuario}</td>
                         <td>${nombresRoles}</td>
                         <td>
-                            <button class='btn btn-outline-success btn-sm' style="font-size:10px;" onclick='editar(${JSON.stringify(u)})'>✏️</button>
-                            <button class='btn btn-outline-danger btn-sm' style="font-size:10px;" onclick='eliminar(${u.idUsuario})'>❌</button>
+                            <button class='btn btn-success' style="font-size:10px;" onclick='editar(${JSON.stringify(u)})'>✏️</button>
+                            <button class='btn btn-danger' style="font-size:10px;" onclick='eliminar(${u.idUsuario})'>❌</button>
                         </td>
                     </tr>`;
             });
