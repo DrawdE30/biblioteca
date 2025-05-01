@@ -13,17 +13,17 @@
         <div class="col-md-6 bg-light p-4 rounded shadow text-center">
             <h1>Catálogo de Libros 📚</h1>
             <form id="libroForm">
-                <input type="text" id="titulo" name="titulo" placeholder="Título" required><br>
-                <input type="text" id="autor" name="autor" placeholder="Autor" required><br>
-                <input type="number" id="anio_publicacion" name="anio_publicacion" placeholder="Año de publicación" required><br>
-                <input type="text" id="isbn" name="isbn" placeholder="ISBN" required><br>
+                <input type="text" class="form-control mb-4" id="titulo" name="titulo" placeholder="Título" required><br>
+                <input type="text" class="form-control mb-4" id="autor" name="autor" placeholder="Autor" required><br>
+                <input type="number" class="form-control mb-4" id="anio_publicacion" name="anio_publicacion" placeholder="Año de publicación" required><br>
+                <input type="text" class="form-control mb-4" id="isbn" name="isbn" placeholder="ISBN" required><br>
                 <label>Categorías:</label><br>
-                <select id="categorias" name="categorias[]" multiple></select><br><br>
+                <select  class="form-control mb-2" id="categorias" name="categorias[]" multiple></select><br><br>
                 <button type="submit" class="btn btn-primary">Guardar Libro</button>
             </form>
 
             <h2>Lista de Libros</h2>
-            <table border="1" id="librosTable">
+            <table class="table table-bordered table-striped" id="librosTable">
                 <thead>
                     <tr>
                         <th>ID</th>
