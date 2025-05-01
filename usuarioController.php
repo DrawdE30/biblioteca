@@ -60,3 +60,4 @@ switch ($action) {
         echo json_encode(['error' => 'Acción no válida']);
         break;
 }
+?>

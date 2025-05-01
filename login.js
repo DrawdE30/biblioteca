@@ -28,7 +28,7 @@ formularioLogin.addEventListener('submit', function (e) {
                 if (tipoUsuario.toUpperCase() === "CLIENTE" || tipoUsuario.toUpperCase() == "COMO: CLIENTE") {
                     window.location.href = './catalogo_libros/filtros.php';
                 } else {
-                    window.location.href = './h11editarlibros.html';
+                    window.location.href = './menu.html';
                 }
                 sessionStorage.setItem('loggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now());

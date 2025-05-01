@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db = "biblioteca";
+$db = "libreria_db";
 
 $conn = new mysqli($host, $user, $pass, $db);
 
