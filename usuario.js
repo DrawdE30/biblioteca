@@ -2,36 +2,51 @@ const form = document.getElementById("form");
 const tableBody = document.getElementById("tableBody");
 const rootPhp = "./usuarioController.php";
 
-form?.addEventListener('submit', e => {
+// Insertar usuario
+form.addEventListener('submit', e => {
     e.preventDefault();
+
     let formData = Object.fromEntries(new FormData(form));
 
-    // Aquí asignamos el rol de "Cliente" automáticamente
-    formData.roles = ["Cliente"];
+    // Asignamos el rol "Cliente" automáticamente
+    formData.roles = ["Cliente"];  // Asignar rol "Cliente" por defecto
+
+    const data = JSON.stringify(formData);
 
     fetch(`${rootPhp}?action=insertar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: data
     })
-    .then(res => res.ok ? res.text() : res.text().then(text => { throw new Error(text) }))
-    .then(text => JSON.parse(text))
-    .then(resp => {
-        alert("Usuario guardado correctamente");
-        form.reset();
-        listarUsuarios();
-    })
-    .catch(err => {
-        console.error("❌ Error al guardar usuario:", err);
-        alert("Error al guardar usuario");
-    });
+        .then(res => {
+            if (!res.ok) {
+                console.error("Error en la respuesta del servidor:", res.status, res.statusText);
+                return res.text().then(text => { throw new Error(`Error en la respuesta: ${text}`); });
+            }
+            return res.text(); // Obtén la respuesta como texto
+        })
+        .then(responseText => {
+            console.log("Respuesta del servidor (texto):", responseText);
+            return JSON.parse(responseText); // Intenta parsear el texto como JSON
+        })
+        .then(resp => {
+            console.log("✅ Guardado:", resp);
+            alert("Usuario guardado correctamente");
+            form.reset();
+            listarUsuarios();  // Actualizamos la lista de usuarios
+        })
+        .catch(err => {
+            console.error("❌ Error al guardar usuario:", err);
+            alert("Error al guardar usuario");
+        });
 });
 
+// Función para listar clientes
 function listarUsuarios() {
     fetch(`${rootPhp}?action=listar`)
         .then(res => res.json())
         .then(data => {
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = '';  // Limpiar la tabla antes de añadir nuevos datos
             data.forEach(u => {
                 const nombresRoles = u.roles.map(rol => rol.nombres).join(', ');
                 tableBody.innerHTML += `
@@ -45,16 +60,16 @@ function listarUsuarios() {
             });
         })
         .catch(error => {
-            console.error("Error al listar usuarios:", error);
-            alert("Error al cargar la lista de usuarios.");
+            console.log("🚀 ~ listarUsuarios ~ error:", error)
+            alert("Ocurrió un error al cargar la lista de usuarios.");
         });
 }
 
 document.addEventListener('DOMContentLoaded', listarUsuarios);
 
 function mostrarTabla() {
-    form?.reset();
-    $("#roles").selectpicker('val', []);
+    document.getElementById("form").reset();
+    $("#roles").selectpicker('val', []);  // Limpia la selección
     document.getElementById("box-data")?.classList.add("d-none");
     document.getElementById("box-list")?.classList.remove("d-none");
 }

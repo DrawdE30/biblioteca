@@ -2,8 +2,7 @@
 ob_clean();
 header('Content-Type: application/json');
 
-class Usuario
-{
+class Usuario {
     public static function getAll($conn, $query = null)
     {
         if ($query === null) {
@@ -12,7 +11,7 @@ class Usuario
                 FROM usuario u
                 LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
                 LEFT JOIN roles r ON r.idRol = ur.idRol
-                ORDER BY u.idUsuario DESC";
+                ORDER BY u.idUsuario DESC"; // Ordenamos por el más reciente
         }
 
         $result = $conn->query($query);
@@ -43,25 +42,30 @@ class Usuario
 
     public static function insert($conn, $data)
     {
-        $conn->begin_transaction(); // Inicia una transacción
+        $conn->begin_transaction();  // Inicia la transacción
 
+        // Insertar usuario
         $stmt = $conn->prepare("INSERT INTO usuario (nombres, usuario, correo, password) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $data['nombre'],  $data['correo'], $data['usuario'], $data['password']);
+        $stmt->bind_param("ssss", $data['nombres'], $data['usuario'], $data['correo'], $data['password']);
 
         if ($stmt->execute()) {
             $idNuevoUsuario = $conn->insert_id;
-            if (self::guardarRoles($conn, $idNuevoUsuario, $data['roles'])) {
-                $conn->commit(); // Si todo va bien, confirma la transacción
-                return $idNuevoUsuario;
+
+            // Asignar rol "Cliente" por defecto si no hay roles
+            $roles = isset($data['roles']) ? $data['roles'] : ['Cliente'];
+            if (self::guardarRoles($conn, $idNuevoUsuario, $roles)) {
+                $conn->commit();
+                return $idNuevoUsuario;  // Devuelve el ID del nuevo usuario
             } else {
-                $conn->rollback(); // Si falla guardarRoles, revierte la inserción del usuario
+                $conn->rollback();
                 return false;
             }
         } else {
-            $conn->rollback(); // Si falla la inserción del usuario, revierte (aunque no haya nada que revertir)
+            $conn->rollback();
             return false;
         }
     }
+
     private static function guardarRoles($conn, $idUsuario, $roles)
     {
         if (is_array($roles) && !empty($roles)) {
@@ -74,8 +78,9 @@ class Usuario
             }
             return true;
         }
-        return true;
+        return false;
     }
+}
 
     public static function update($conn, $data)
     {

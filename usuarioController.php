@@ -12,22 +12,21 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 switch ($action) {
     case 'listar_roles':
+        // Consultamos y mostramos todos los roles disponibles
         echo json_encode(Rol::getAll($conn));
         break;
 
     case 'listar':
-        // Consulta modificada para filtrar por rol "Cliente"
-        $query = "
-            SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
-            FROM usuario u
-            LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
-            LEFT JOIN roles r ON r.idRol = ur.idRol
-            WHERE r.nombre = 'Cliente'  -- Filtramos solo los usuarios con rol 'Cliente'
-            ORDER BY u.idUsuario DESC";  // Ordenamos por el más reciente (por idUsuario)
-        echo json_encode(Usuario::getAll($conn, $query));
+        // Mostrar los usuarios con el rol "Cliente"
+        echo json_encode(Usuario::getAll($conn, "WHERE r.nombre = 'Cliente'"));
         break;
 
     case 'insertar':
+        // Aquí asignamos el rol de "Cliente" automáticamente
+        // Aseguramos que los roles sean "Cliente" por defecto
+        if (!isset($data['roles']) || empty($data['roles'])) {
+            $data['roles'] = ["Cliente"];  // Asignar rol "Cliente" de forma predeterminada
+        }
         echo json_encode(['success' => Usuario::insert($conn, $data)]);
         break;
 
@@ -44,6 +43,7 @@ switch ($action) {
         break;
 
     case 'login':
+        // Verificamos el login
         $data['tipoUsuario'] = strtoupper($data['tipoUsuario']);
         $usuario = $data['correo'];
         $usuario = Usuario::login($conn, $usuario, $data['password'], $data['tipoUsuario']);
@@ -68,5 +68,6 @@ switch ($action) {
         echo json_encode(['error' => 'Acción no válida']);
         break;
 }
+
 
 ?>
