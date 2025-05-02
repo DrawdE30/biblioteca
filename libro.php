@@ -1,7 +1,6 @@
 <?php
-ob_clean();
 header('Content-Type: application/json');
-require 'config.php';
+$conexion = new mysqli('localhost', 'root', '', 'biblioteca');
 
 class Libro {
     public static function listar($conn) {
@@ -78,16 +77,41 @@ $action = $_GET['action'] ?? '';
 // ✅ Manejo de acciones
 switch ($action) {
     case 'listar':
-        Libro::listar($conn);
+        $resultado = $conexion->query("SELECT * FROM libros");
+        $libros = [];
+
+        while ($fila = $resultado->fetch_assoc()) {
+            $fila['categorias'] = explode(',', $fila['categorias']);
+            $libros[] = $fila;
+        }
+
+        echo json_encode($libros);
         break;
+
     case 'insertar':
-        Libro::insertar($conn, $data);
+        $datos = json_decode(file_get_contents('php://input'), true);
+        $stmt = $conexion->prepare("INSERT INTO libros (isbn, titulo, autor, editorial, anio, categorias) VALUES (?, ?, ?, ?, ?, ?)");
+        $categorias = implode(',', $datos['categorias']);
+        $stmt->bind_param("ssssis", $datos['isbn'], $datos['titulo'], $datos['autor'], $datos['editorial'], $datos['anio'], $categorias);
+        $stmt->execute();
+        echo json_encode(["success" => true]);
         break;
+
     case 'actualizar':
-        Libro::actualizar($conn, $data);
+        $datos = json_decode(file_get_contents('php://input'), true);
+        $stmt = $conexion->prepare("UPDATE libros SET isbn=?, titulo=?, autor=?, editorial=?, anio=?, categorias=? WHERE idLibro=?");
+        $categorias = implode(',', $datos['categorias']);
+        $stmt->bind_param("ssssisi", $datos['isbn'], $datos['titulo'], $datos['autor'], $datos['editorial'], $datos['anio'], $categorias, $datos['idLibro']);
+        $stmt->execute();
+        echo json_encode(["success" => true]);
         break;
+
     case 'eliminar':
-        Libro::eliminar($conn, $data['idLibro']);
+        $datos = json_decode(file_get_contents('php://input'), true);
+        $stmt = $conexion->prepare("DELETE FROM libros WHERE idLibro=?");
+        $stmt->bind_param("i", $datos['idLibro']);
+        $stmt->execute();
+        echo json_encode(["success" => true]);
         break;
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);

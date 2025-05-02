@@ -4,13 +4,18 @@ header('Content-Type: application/json');
 
 class Usuario
 {
-    public static function getAll($conn)
+    public static function getAll($conn, $query = null)
     {
-        $result = $conn->query("SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
-                                FROM usuario u
-                                LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
-                                LEFT JOIN roles r ON r.idRol = ur.idRol
-                                ORDER BY u.idUsuario");
+        if ($query === null) {
+            $query = "
+                SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
+                FROM usuario u
+                LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
+                LEFT JOIN roles r ON r.idRol = ur.idRol
+                ORDER BY u.idUsuario DESC";
+        }
+
+        $result = $conn->query($query);
 
         $usuarios = [];
         while ($row = $result->fetch_assoc()) {
@@ -33,7 +38,7 @@ class Usuario
                 ];
             }
         }
-        return array_values($usuarios); // Devuelve un array indexado numéricamente
+        return array_values($usuarios);  // Devuelve un array indexado numéricamente
     }
 
     public static function insert($conn, $data)

@@ -1,19 +1,13 @@
 const form = document.getElementById("form");
 const tableBody = document.getElementById("tableBody");
 const rootPhp = "./usuarioController.php";
-let editando = false;
 
 form?.addEventListener('submit', e => {
     e.preventDefault();
     let formData = Object.fromEntries(new FormData(form));
-    const selectObject = document.getElementById("roles");
-    let roles = [];
-    for (let i = 0; i < selectObject.options.length; i++) {
-        if (selectObject.options[i].selected) {
-            roles.push(selectObject.options[i].value);
-        }
-    }
-    formData.roles = roles;
+
+    // Aquí asignamos el rol de "Cliente" automáticamente
+    formData.roles = ["Cliente"];
 
     fetch(`${rootPhp}?action=insertar`, {
         method: 'POST',
@@ -26,7 +20,6 @@ form?.addEventListener('submit', e => {
         alert("Usuario guardado correctamente");
         form.reset();
         listarUsuarios();
-        mostrarTabla();
     })
     .catch(err => {
         console.error("❌ Error al guardar usuario:", err);
@@ -34,12 +27,63 @@ form?.addEventListener('submit', e => {
     });
 });
 
+function listarUsuarios() {
+    fetch(`${rootPhp}?action=listar`)
+        .then(res => res.json())
+        .then(data => {
+            tableBody.innerHTML = '';
+            data.forEach(u => {
+                const nombresRoles = u.roles.map(rol => rol.nombres).join(', ');
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${u.idUsuario}</td>
+                        <td>${u.nombres}</td>
+                        <td>${u.correo}</td>
+                        <td>${u.usuario}</td>
+                        <td>${nombresRoles}</td>
+                    </tr>`;
+            });
+        })
+        .catch(error => {
+            console.error("Error al listar usuarios:", error);
+            alert("Error al cargar la lista de usuarios.");
+        });
+}
+
+document.addEventListener('DOMContentLoaded', listarUsuarios);
+
 function mostrarTabla() {
     form?.reset();
     $("#roles").selectpicker('val', []);
     document.getElementById("box-data")?.classList.add("d-none");
     document.getElementById("box-list")?.classList.remove("d-none");
 }
+
+function listarRoles() {
+    fetch('get_roles.php')  // Asegúrate de que esta ruta sea correcta
+        .then(res => {
+            if (!res.ok) throw new Error('Error al cargar roles');
+            return res.json();
+        })
+        .then(data => {
+            const rolesSelect = document.getElementById('roles');
+            rolesSelect.innerHTML = '';  // Limpiar el select
+            data.forEach(rol => {
+                const option = document.createElement('option');
+                option.value = rol.idRol;
+                option.textContent = rol.nombre;
+                rolesSelect.appendChild(option);
+            });
+            $('.selectpicker').selectpicker('refresh');
+        })
+        .catch(error => {
+            console.error("🚀 ~ listarRoles ~ error:", error);
+            alert("Ocurrió un error al cargar la lista de roles.");
+        });
+}
+
+document.addEventListener('DOMContentLoaded', listarRoles);
+
 
 function listarRol() {
     fetch(`${rootPhp}?action=listar_roles`)
@@ -61,36 +105,6 @@ function listarRol() {
         });
 }
 
-function listarUsuarios() {
-    fetch(`${rootPhp}?action=listar`)
-        .then(res => res.json())
-        .then(data => {
-            tableBody.innerHTML = '';
-            data.forEach(u => {
-                const nombresRoles = u.roles.map(rol => rol.nombres).join(', ');
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>${u.idUsuario}</td>
-                        <td>${u.nombres}</td>
-                        <td>${u.correo}</td>
-                        <td>${u.usuario}</td>
-                        <td>${nombresRoles}</td>
-                        <td>
-                            <button class='btn btn-success btn-sm me-1' onclick='editar(${JSON.stringify(u)})'>
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class='btn btn-danger btn-sm' onclick='eliminar(${u.idUsuario})'>
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-            });
-        })
-        .catch(error => {
-            console.error("Error al listar usuarios:", error);
-            alert("Error al cargar la lista de usuarios.");
-        });
-}
 
 function editar(u) {
     document.getElementById("box-data")?.classList.remove("d-none");

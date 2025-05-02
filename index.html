@@ -28,10 +28,12 @@
         style="width: 100%; max-width: 400px"
       >
         <div class="text-center mb-4">
-          <div id="icon-init" class="fs-1 d-none">👤</div>
-          <div id="icon-customer" class="fs-1">🙋‍♂️</div>
-          <div id="icon-worker" class="fs-1 d-none">👷🏻‍♂️</div>
-          <h3 class="mt-2">Iniciar Sesión</h3>
+          <center><img src="./assets/img/logo2.png" alt="Logo" 
+            class="img-fluid mb-0" style="width: 180px; height: auto;">
+          <!--<div id="icon-init" class="fs-1 d-none">👤</div>
+          <div id="icon-customer" class="fs-1"></div>
+          <div id="icon-worker" class="fs-1 d-none"></div>-->
+          <h5 class="mt-2">Iniciar Sesión</h5>
         </div>
 
         <ul
@@ -50,7 +52,7 @@
               aria-selected="true"
               onclick="mostrarFormulario('Cliente')"
             >
-              Como Cliente
+            🙋‍♂️  Como Cliente
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -63,7 +65,7 @@
               aria-selected="false"
               onclick="mostrarFormulario('Colaborador')"
             >
-              Como Colaborador
+            👷🏻‍♂️ Como Usuario
             </button>
           </li>
         </ul>
@@ -98,10 +100,9 @@
           </div>
 
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button type="button" class="btn btn-danger" onclick="regresar()">
-              Cancelar
-            </button>
             <button type="submit" class="btn btn-primary">Login</button>
+            <button type="button" class="btn btn-danger" onclick="regresar()">
+              Cancelar </button>
           </div>
           <div class="mt-3 mb-3 text-center">
             <a href="./recuperar.html" target="_blank">¿Olvidaste tu contraseña?</a>

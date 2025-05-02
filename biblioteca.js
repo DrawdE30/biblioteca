@@ -21,8 +21,12 @@ function listarClientes() {
                         <td>${c.correo}</td>
                         <td>${c.direccion}</td>
                         <td>
-                            <button onclick='editar(${c.idCliente})'>✏️</button>
-                            <button onclick='eliminar(${c.idCliente})'>❌</button>
+                            <button class='btn btn-success btn-sm me-1' onclick='editar(${c.idCliente})'>
+                            <i class="fas fa-edit"></i>
+                            </button>
+                            <button class='btn btn-danger btn-sm' onclick='eliminar(${c.idCliente})'>
+                            <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>`;
             });

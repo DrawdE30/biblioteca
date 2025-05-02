@@ -16,7 +16,15 @@ switch ($action) {
         break;
 
     case 'listar':
-        echo json_encode(Usuario::getAll($conn));
+        // Consulta modificada para filtrar por rol "Cliente"
+        $query = "
+            SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
+            FROM usuario u
+            LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
+            LEFT JOIN roles r ON r.idRol = ur.idRol
+            WHERE r.nombre = 'Cliente'  -- Filtramos solo los usuarios con rol 'Cliente'
+            ORDER BY u.idUsuario DESC";  // Ordenamos por el más reciente (por idUsuario)
+        echo json_encode(Usuario::getAll($conn, $query));
         break;
 
     case 'insertar':
@@ -60,4 +68,5 @@ switch ($action) {
         echo json_encode(['error' => 'Acción no válida']);
         break;
 }
+
 ?>
