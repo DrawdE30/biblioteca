@@ -2,12 +2,6 @@
 header('Content-Type: application/json');
 $conexion = new mysqli('localhost', 'root', '', 'biblioteca');
 
-<<<<<<< HEAD
-if ($conexion->connect_error) {
-    die(json_encode(["success" => false, "error" => $conexion->connect_error]));
-}
-
-=======
 class Libro {
     public static function listar($conn) {
         $result = $conn->query("SELECT l.*, GROUP_CONCAT(c.nombre) as categorias
@@ -78,7 +72,6 @@ class Libro {
 
 // ✅ Este bloque lee los datos JSON ENVIADOS por fetch()
 $data = json_decode(file_get_contents('php://input'), true);
->>>>>>> 56642b32d0b9f4187e65e0769078b588ba5d3fe2
 $action = $_GET['action'] ?? '';
 
 // ✅ Manejo de acciones
