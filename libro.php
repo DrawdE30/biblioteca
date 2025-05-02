@@ -113,14 +113,8 @@ switch ($action) {
         $stmt->execute();
         echo json_encode(["success" => true]);
         break;
-<<<<<<< HEAD
-
-    default:
-        echo json_encode(["success" => false, "error" => "Acción no válida"]);
-=======
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);
         break;
->>>>>>> 56642b32d0b9f4187e65e0769078b588ba5d3fe2
 }
 ?>
