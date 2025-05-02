@@ -53,6 +53,7 @@ function eliminarLibro(idLibro) {
     if (confirm("¿Eliminar libro?")) {
         fetch(`${rootLibroPhp}?action=eliminar`, {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idLibro })
         }).then(() => listarLibros());
     }
@@ -63,6 +64,12 @@ formLibro.addEventListener('submit', e => {
 
     const formData = new FormData(formLibro);
     const categorias = Array.from(document.getElementById('categorias').selectedOptions).map(opt => opt.value);
+    
+    if (categorias.length === 0) {
+        alert("Selecciona al menos una categoría.");
+        return;
+    }
+
     const data = Object.fromEntries(formData.entries());
     data.categorias = categorias.map(id => parseInt(id));
     

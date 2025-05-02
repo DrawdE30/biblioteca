@@ -7,6 +7,7 @@ formularioLogin.addEventListener('submit', function (e) {
     const correo = document.getElementById('correo').value.trim();
     const password = document.getElementById('password').value.trim();
     const tipoUsuario = document.getElementById('tipoUsuario').innerText.replace('Registrando como: ', '').trim();
+    console.log("🚀 ~ tipoUsuario:", tipoUsuario)
 
     const datosLogin = {
         correo,
@@ -23,12 +24,11 @@ formularioLogin.addEventListener('submit', function (e) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log("🚀 ~ data:", data)
             if (data.success) {
-                if (tipoUsuario.toUpperCase() == "CLIENTE") {
-                    window.location.href = 'historial.html';
+                if (tipoUsuario.toUpperCase() === "CLIENTE" || tipoUsuario.toUpperCase() == "COMO: CLIENTE") {
+                    window.location.href = './catalogo_libros/filtros.php';
                 } else {
-                    window.location.href = 'h11editarlibros.html';
+                    window.location.href = './h11editarlibros.html';
                 }
                 sessionStorage.setItem('loggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now());
