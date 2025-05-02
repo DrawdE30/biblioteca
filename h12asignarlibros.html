@@ -2,42 +2,40 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo de Libros - Gestión</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestión de Libros</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Gestión de Libros</h2>
 
-<div class="container mt-5 mb-5">
-  <h2 class="text-center mb-4">GESTIÓN DE CATÁLOGO DE LIBROS</h2>
-
-  <!-- Formulario -->
-  <form id="formularioLibro" class="border p-4 shadow rounded bg-light">
-    <input type="hidden" id="idLibro">
+  <form id="formularioLibro" class="bg-light p-4 rounded shadow">
+    <input type="hidden" id="idLibro" name="idLibro">
 
     <div class="mb-3">
-      <label for="isbn" class="form-label">ISBN:</label>
+      <label for="isbn" class="form-label">ISBN</label>
       <input type="text" class="form-control" id="isbn" name="isbn" required>
     </div>
     <div class="mb-3">
-      <label for="titulo" class="form-label">Título:</label>
+      <label for="titulo" class="form-label">Título</label>
       <input type="text" class="form-control" id="titulo" name="titulo" required>
     </div>
     <div class="mb-3">
-      <label for="autor" class="form-label">Autor:</label>
+      <label for="autor" class="form-label">Autor</label>
       <input type="text" class="form-control" id="autor" name="autor" required>
     </div>
     <div class="mb-3">
-      <label for="editorial" class="form-label">Editorial:</label>
+      <label for="editorial" class="form-label">Editorial</label>
       <input type="text" class="form-control" id="editorial" name="editorial" required>
     </div>
     <div class="mb-3">
-      <label for="anio" class="form-label">Año de Publicación:</label>
-      <input type="number" class="form-control" id="anio" name="anio" min="1000" max="9999" required>
+      <label for="anio" class="form-label">Año</label>
+      <input type="number" class="form-control" id="anio" name="anio" required>
     </div>
     <div class="mb-3">
-      <label for="categorias" class="form-label">Categorías:</label>
-      <select multiple class="form-select" id="categorias" name="categorias" required>
+      <label for="categorias" class="form-label">Categorías</label>
+      <select multiple class="form-select" id="categorias" name="categorias[]">
         <option value="Literatura">Literatura</option>
         <option value="Ciencia">Ciencia</option>
         <option value="Historia">Historia</option>
@@ -46,144 +44,129 @@
         <option value="Educación">Educación</option>
         <option value="Negocios">Negocios</option>
       </select>
-      <small class="text-muted">Ctrl (o Cmd en Mac) para seleccionar varias categorías.</small>
     </div>
 
-    <div class="text-center d-grid gap-2 d-md-block">
-      <button type="submit" class="btn btn-primary">Guardar Libro</button>
-      <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">Limpiar</button>
+    <div class="text-center">
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <button type="button" class="btn btn-secondary" onclick="resetFormulario()">Limpiar</button>
     </div>
   </form>
 
-  <!-- Tabla de Libros -->
-  <div class="mt-5">
-    <h3 class="text-center">Libros Registrados</h3>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>ISBN</th>
-            <th>Título</th>
-            <th>Autor</th>
-            <th>Editorial</th>
-            <th>Año</th>
-            <th>Categorías</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tablaLibros">
-          <!-- Libros aparecerán aquí -->
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <hr>
+
+  <h4 class="text-center mt-4">Libros Registrados</h4>
+  <table class="table table-bordered mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>ISBN</th>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>Editorial</th>
+        <th>Año</th>
+        <th>Categorías</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tablaLibros">
+    </tbody>
+  </table>
 </div>
 
-<!-- SCRIPT -->
 <script>
-const formulario = document.getElementById('formularioLibro');
-const tabla = document.getElementById('tablaLibros');
-let editandoId = null;
+async function cargarLibros() {
+  const res = await fetch('libroGestion.php?action=listar');
+  const libros = await res.json();
 
-formulario.addEventListener('submit', function(e) {
+  const tabla = document.getElementById('tablaLibros');
+  tabla.innerHTML = '';
+
+  libros.forEach((libro, index) => {
+    const fila = `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${libro.isbn}</td>
+        <td>${libro.titulo}</td>
+        <td>${libro.autor}</td>
+        <td>${libro.editorial}</td>
+        <td>${libro.anio}</td>
+        <td>${libro.categorias}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick='editarLibro(${JSON.stringify(libro)})'>Editar</button>
+          <button class="btn btn-danger btn-sm" onclick='eliminarLibro(${libro.idLibro})'>Eliminar</button>
+        </td>
+      </tr>`;
+    tabla.innerHTML += fila;
+  });
+}
+
+document.getElementById('formularioLibro').addEventListener('submit', async function(e) {
   e.preventDefault();
 
-  const categoriasSeleccionadas = Array.from(document.getElementById('categorias').selectedOptions).map(option => option.value);
-
+  const idLibro = document.getElementById('idLibro').value;
   const libro = {
     isbn: document.getElementById('isbn').value,
     titulo: document.getElementById('titulo').value,
     autor: document.getElementById('autor').value,
     editorial: document.getElementById('editorial').value,
-    anio: document.getElementById('anio').value,
-    categorias: categoriasSeleccionadas
+    anio: parseInt(document.getElementById('anio').value),
+    categorias: Array.from(document.getElementById('categorias').selectedOptions).map(o => o.value)
   };
 
-  const action = editandoId ? 'actualizar' : 'insertar';
-  if (editandoId) libro.idLibro = editandoId;
+  let url = 'libroGestion.php?action=' + (idLibro ? 'actualizar' : 'insertar');
+  if (idLibro) libro.idLibro = parseInt(idLibro);
 
-  fetch(`libro.php?action=${action}`, {
+  const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(libro)
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      limpiarFormulario();
-      cargarLibros();
-    } else {
-      alert('Error al guardar: ' + (data.error || ''));
-    }
+    body: JSON.stringify(libro),
+    headers: { 'Content-Type': 'application/json' }
   });
+
+  const resultado = await res.json();
+  if (resultado.success) {
+    resetFormulario();
+    cargarLibros();
+  } else {
+    alert('Error: ' + resultado.error);
+  }
 });
 
-function cargarLibros() {
-  fetch('libro.php?action=listar')
-    .then(res => res.json())
-    .then(libros => {
-      tabla.innerHTML = "";
-      libros.forEach(libro => {
-        tabla.innerHTML += `
-          <tr>
-            <td>${libro.idLibro}</td>
-            <td>${libro.isbn}</td>
-            <td>${libro.titulo}</td>
-            <td>${libro.autor}</td>
-            <td>${libro.editorial}</td>
-            <td>${libro.anio}</td>
-            <td>${libro.categorias.join(", ")}</td>
-            <td>
-              <button class="btn btn-warning btn-sm" onclick='editarLibro(${JSON.stringify(libro)})'>Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="eliminarLibro(${libro.idLibro})">Eliminar</button>
-            </td>
-          </tr>`;
-      });
-    });
-}
-
 function editarLibro(libro) {
+  document.getElementById('idLibro').value = libro.idLibro;
   document.getElementById('isbn').value = libro.isbn;
   document.getElementById('titulo').value = libro.titulo;
   document.getElementById('autor').value = libro.autor;
   document.getElementById('editorial').value = libro.editorial;
   document.getElementById('anio').value = libro.anio;
-  
-  const selectCategorias = document.getElementById('categorias');
-  Array.from(selectCategorias.options).forEach(option => {
+
+  const opciones = document.getElementById('categorias').options;
+  for (let option of opciones) {
     option.selected = libro.categorias.includes(option.value);
-  });
-
-  editandoId = libro.idLibro;
-}
-
-function eliminarLibro(id) {
-  if (confirm('¿Seguro que quieres eliminar este libro?')) {
-    fetch('libro.php?action=eliminar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idLibro: id })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        cargarLibros();
-      } else {
-        alert('Error al eliminar');
-      }
-    });
   }
 }
 
-function limpiarFormulario() {
-  formulario.reset();
-  editandoId = null;
+async function eliminarLibro(idLibro) {
+  if (!confirm('¿Estás seguro de eliminar este libro?')) return;
+
+  const res = await fetch('libroGestion.php?action=eliminar', {
+    method: 'POST',
+    body: JSON.stringify({ idLibro }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  const resultado = await res.json();
+  if (resultado.success) cargarLibros();
 }
 
-cargarLibros();
-</script>
+function resetFormulario() {
+  document.getElementById('formularioLibro').reset();
+  document.getElementById('idLibro').value = '';
+}
 
+window.onload = cargarLibros;
+</script>
 </body>
 </html>
+
+
 
