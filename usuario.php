@@ -2,19 +2,15 @@
 ob_clean();
 header('Content-Type: application/json');
 
-class Usuario {
-    public static function getAll($conn, $query = null)
+class Usuario
+{
+    public static function getAll($conn)
     {
-        if ($query === null) {
-            $query = "
-                SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
-                FROM usuario u
-                LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
-                LEFT JOIN roles r ON r.idRol = ur.idRol
-                ORDER BY u.idUsuario DESC"; // Ordenamos por el más reciente
-        }
-
-        $result = $conn->query($query);
+        $result = $conn->query("SELECT u.idUsuario, u.usuario, u.password, u.nombres, u.correo, u.status, r.idRol, r.nombre AS nombreRol
+                                FROM usuario u
+                                LEFT JOIN usuario_rol ur ON ur.idUsuario = u.idUsuario
+                                LEFT JOIN roles r ON r.idRol = ur.idRol
+                                ORDER BY u.idUsuario");
 
         $usuarios = [];
         while ($row = $result->fetch_assoc()) {
@@ -37,81 +33,60 @@ class Usuario {
                 ];
             }
         }
-        return array_values($usuarios);  // Devuelve un array indexado numéricamente
+        return array_values($usuarios); // Devuelve un array indexado numéricamente
     }
 
     public static function insert($conn, $data)
     {
-        $conn->begin_transaction();  // Inicia la transacción
+        $conn->begin_transaction(); // Inicia una transacción
 
-        // Insertar usuario
-        $stmt = $conn->prepare("INSERT INTO usuario (nombres, usuario, correo, password) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $data['nombres'], $data['usuario'], $data['correo'], $data['password']);
+        $stmt = $conn->prepare("INSERT INTO usuario (nombres, usuario, correo, password, status) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssi", $data['nombres'],  $data['usuario'], $data['correo'], $data['password'], 1);
 
         if ($stmt->execute()) {
             $idNuevoUsuario = $conn->insert_id;
-
-            // Asignar rol "Cliente" por defecto si no hay roles
-            $roles = isset($data['roles']) ? $data['roles'] : ['Cliente'];
-            if (self::guardarRoles($conn, $idNuevoUsuario, $roles)) {
-                $conn->commit();
-                return $idNuevoUsuario;  // Devuelve el ID del nuevo usuario
+            if (self::guardarRoles($conn, $idNuevoUsuario, $data['roles'])) {
+                $conn->commit(); // Si todo va bien, confirma la transacción
+                return $idNuevoUsuario;
             } else {
-                $conn->rollback();
+                $conn->rollback(); // Si falla guardarRoles, revierte la inserción del usuario
                 return false;
             }
         } else {
-            $conn->rollback();
+            $conn->rollback(); // Si falla la inserción del usuario, revierte (aunque no haya nada que revertir)
             return false;
         }
     }
-
     private static function guardarRoles($conn, $idUsuario, $roles)
     {
         if (is_array($roles) && !empty($roles)) {
-            // Elimina los roles anteriores
             $stmt = $conn->prepare("DELETE FROM usuario_rol WHERE idUsuario = ?");
             $stmt->bind_param("i", $idUsuario);
             $stmt->execute();
-            $stmt->close(); // ✅ Cerramos el statement anterior
-    
-            // Insertamos los nuevos roles
+            $stmt->close();
+
             $stmt = $conn->prepare("INSERT INTO usuario_rol (idUsuario, idRol) VALUES (?, ?)");
-            if (!$stmt) {
-                return false;
-            }
-    
             foreach ($roles as $idRol) {
                 $stmt->bind_param("ii", $idUsuario, $idRol);
                 if (!$stmt->execute()) {
-                    $stmt->close();
                     return false;
                 }
             }
-    
-            $stmt->close();
             return true;
         }
-        return false;
+        return true;
     }
-}
 
     public static function update($conn, $data)
     {
         $stmt = $conn->prepare("UPDATE usuario SET nombres=?, correo=?, usuario=?, password=?, status=? WHERE idUsuario=?");
         $stmt->bind_param("ssssii", $data['nombres'], $data['correo'], $data['usuario'], $data['password'], $data['status'], $data['idUsuario']);
-        if($stmt->execute()){
-            if (self::guardarRoles($conn, $data['idUsuario'], $data['roles'])) {
-                return true;
-            }
-        }else{
-            return false;
-        }
+        return $stmt->execute();
     }
 
     public static function delete($conn, $id)
     {
-        $stmt = $conn->prepare("UPDATE usuario SET status=2 WHERE idUsuario=?");
+        $stmt = $conn->prepare("UPDATE usuario SET status=1 WHERE idUsuario=?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();
         // $stmt = $conn->prepare("DELETE FROM usuario WHERE idUsuario=?");

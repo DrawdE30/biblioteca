@@ -30,9 +30,6 @@
         <div class="text-center mb-4">
           <center><img src="./assets/img/logo2.png" alt="Logo" 
             class="img-fluid mb-0" style="width: 180px; height: auto;">
-          <!--<div id="icon-init" class="fs-1 d-none">👤</div>
-          <div id="icon-customer" class="fs-1"></div>
-          <div id="icon-worker" class="fs-1 d-none"></div>-->
           <h5 class="mt-2">Iniciar Sesión</h5>
         </div>
 
@@ -94,7 +91,7 @@
               type="password"
               class="form-control"
               id="password"
-              placeholder="***************"
+              placeholder="******"
               required
             />
           </div>
@@ -116,7 +113,6 @@
 
     <script>
       function mostrarFormulario(tipo) {
-        document.getElementById("icon-init").classList.add("d-none");
         document.getElementById("formularioLogin").classList.remove("d-none");
 
         // Actualizar la clase activa de las pestañas
@@ -126,15 +122,11 @@
           .classList.remove("active");
 
         if (tipo == "Cliente") {
-          document.getElementById("icon-worker").classList.add("d-none");
-          document.getElementById("icon-customer").classList.remove("d-none");
           document.getElementById("pills-cliente-tab").classList.add("active");
           document.getElementById("tipoUsuario").innerText =
             "Como: Cliente";
         }
         if (tipo == "Colaborador") {
-          document.getElementById("icon-customer").classList.add("d-none");
-          document.getElementById("icon-worker").classList.remove("d-none");
           document
             .getElementById("pills-colaborador-tab")
             .classList.add("active");
@@ -144,10 +136,6 @@
       }
 
       function regresar() {
-        document.getElementById("icon-init").classList.remove("d-none");
-        document.getElementById("icon-worker").classList.add("d-none");
-        document.getElementById("icon-customer").classList.add("d-none");
-
         document.getElementById("formularioLogin").reset();
         document.getElementById("formularioLogin").classList.add("d-none");
 
@@ -157,10 +145,6 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("icon-init").classList.add("d-none");
-        document.getElementById("icon-customer").classList.remove("d-none");
-        document.getElementById("icon-worker").classList.add("d-none");
-
         document.getElementById("formularioLogin").classList.remove("d-none");
         document.getElementById("tipoUsuario").innerText =
           "Registrando como: Cliente";

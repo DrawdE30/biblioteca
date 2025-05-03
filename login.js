@@ -24,10 +24,15 @@ formularioLogin.addEventListener('submit', function (e) {
     })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             if (data.success) {
                 if (tipoUsuario.toUpperCase() === "CLIENTE" || tipoUsuario.toUpperCase() == "COMO: CLIENTE") {
                     window.location.href = './catalogo_libros/filtros.php';
                 } else {
+                    if(data.usuario.status != 1){
+                        alert('Usuario Inactivo');
+                        return
+                    }
                     window.location.href = './menu.html';
                 }
                 sessionStorage.setItem('loggedIn', 'true');
