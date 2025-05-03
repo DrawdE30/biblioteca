@@ -56,10 +56,6 @@ $resultado = $conn->query($sql);
     <title>Filtrar y Ordenar Catálogo</title>
     <link rel="stylesheet" href="bootstrap.min.css" crossorigin="anonymous">
     <link href="https://getbootstrap.com/docs/5.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<<<<<<< HEAD
-    <link href="https://getbootstrap.com/docs/5.1/assets/css/docs.css" rel="stylesheet">
-=======
->>>>>>> ec1b365d480230c59e69edb7afdf49da4f22e14b
     <style>
         body {
             background: #f8f9fa;
@@ -113,21 +109,6 @@ $resultado = $conn->query($sql);
         <form method="GET">
             <div class="mb-3">
                 <label class="form-label">Categoría:</label>
-<<<<<<< HEAD
-                <input type="text" name="categoria" class="form-control" placeholder="Ej: Novela">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Autor:</label>
-                <input type="text" name="autor" class="form-control" placeholder="Ej: Gabriel García Márquez">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Precio mínimo:</label>
-                <input type="number" name="precio_min" class="form-control" step="0.01">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Precio máximo:</label>
-                <input type="number" name="precio_max" class="form-control" step="0.01">
-=======
                 <select name="categoria" class="form-select">
                     <option value="">Selecciona una categoría</option>
                     <?php while ($row_categoria = $result_categoria->fetch_assoc()): ?>
@@ -155,19 +136,13 @@ $resultado = $conn->query($sql);
             <div class="mb-3">
                 <label class="form-label">Precio máximo:</label>
                 <input type="number" name="precio_max" class="form-control" step="0.01" value="<?php echo isset($_GET['precio_max']) ? htmlspecialchars($_GET['precio_max']) : ''; ?>">
->>>>>>> ec1b365d480230c59e69edb7afdf49da4f22e14b
             </div>
             <div class="mb-3">
                 <label class="form-label">Ordenar por:</label>
                 <select name="orden" class="form-select">
                     <option value="">---</option>
-<<<<<<< HEAD
-                    <option value="precio_asc">Precio: Menor a Mayor</option>
-                    <option value="precio_desc">Precio: Mayor a Menor</option>
-=======
                     <option value="precio_asc" <?php echo isset($_GET['orden']) && $_GET['orden'] == 'precio_asc' ? 'selected' : ''; ?>>Precio: Menor a Mayor</option>
                     <option value="precio_desc" <?php echo isset($_GET['orden']) && $_GET['orden'] == 'precio_desc' ? 'selected' : ''; ?>>Precio: Mayor a Menor</option>
->>>>>>> ec1b365d480230c59e69edb7afdf49da4f22e14b
                 </select>
             </div>
             <div class="text-center">
@@ -176,24 +151,6 @@ $resultado = $conn->query($sql);
             </div>
         </form>
     </div>
-<<<<<<< HEAD
-
-    <ul class="list-group">
-<?php while($row = $resultado->fetch_assoc()): ?>
-    <li class="list-group-item d-flex align-items-center">
-        <!-- Imagen de portada -->
-        <?php if (!empty($row['imagen_portada'])): ?>
-            <img src="imagenes/<?php echo htmlspecialchars($row['imagen_portada']); ?>" alt="Portada de <?php echo htmlspecialchars($row['titulo']); ?>" width="80" class="me-3 rounded">
-        <?php endif; ?>
-
-        <!-- Información del libro -->
-        <a href="detalle.php?id=<?php echo $row['id']; ?>" class="text-decoration-none flex-grow-1">
-            <?php echo htmlspecialchars($row['titulo']); ?> - $<?php echo number_format($row['precio'], 2); ?>
-        </a>
-    </li>
-<?php endwhile; ?>
-</ul>
-=======
 
     <?php if ($resultado->num_rows > 0): ?>
         <div class="book-list">
@@ -222,4 +179,3 @@ $resultado = $conn->query($sql);
 
 </body>
 </html>
->>>>>>> ec1b365d480230c59e69edb7afdf49da4f22e14b
