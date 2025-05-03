@@ -69,13 +69,27 @@ class Usuario {
     private static function guardarRoles($conn, $idUsuario, $roles)
     {
         if (is_array($roles) && !empty($roles)) {
+            // Elimina los roles anteriores
+            $stmt = $conn->prepare("DELETE FROM usuario_rol WHERE idUsuario = ?");
+            $stmt->bind_param("i", $idUsuario);
+            $stmt->execute();
+            $stmt->close(); // ✅ Cerramos el statement anterior
+    
+            // Insertamos los nuevos roles
             $stmt = $conn->prepare("INSERT INTO usuario_rol (idUsuario, idRol) VALUES (?, ?)");
+            if (!$stmt) {
+                return false;
+            }
+    
             foreach ($roles as $idRol) {
                 $stmt->bind_param("ii", $idUsuario, $idRol);
                 if (!$stmt->execute()) {
+                    $stmt->close();
                     return false;
                 }
             }
+    
+            $stmt->close();
             return true;
         }
         return false;
@@ -84,16 +98,25 @@ class Usuario {
 
     public static function update($conn, $data)
     {
-        $stmt = $conn->prepare("UPDATE usuario SET nombres=?, usuario=?, password=? WHERE idUsuario=?");
-        $stmt->bind_param("ssi", $data['usuario'], $data['password'], $data['idUsuario']);
-        return $stmt->execute();
+        $stmt = $conn->prepare("UPDATE usuario SET nombres=?, correo=?, usuario=?, password=?, status=? WHERE idUsuario=?");
+        $stmt->bind_param("ssssii", $data['nombres'], $data['correo'], $data['usuario'], $data['password'], $data['status'], $data['idUsuario']);
+        if($stmt->execute()){
+            if (self::guardarRoles($conn, $data['idUsuario'], $data['roles'])) {
+                return true;
+            }
+        }else{
+            return false;
+        }
     }
 
     public static function delete($conn, $id)
     {
-        $stmt = $conn->prepare("DELETE FROM usuario WHERE idUsuario=?");
+        $stmt = $conn->prepare("UPDATE usuario SET status=2 WHERE idUsuario=?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();
+        // $stmt = $conn->prepare("DELETE FROM usuario WHERE idUsuario=?");
+        // $stmt->bind_param("i", $id);
+        // return $stmt->execute();
     }
 
     public static function getById($conn, $id)
